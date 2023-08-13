@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { API } from '../../Config';
 
 function SignIn() {
+  const navigate = useNavigate();
+  const isToken = localStorage.getItem('access_token');
+
   const [userInfo, setUserInfo] = useState({
     idValue: '',
     pwValue: '',
   });
+  const { idValue, pwValue } = userInfo;
 
   const getUserInfo = e => {
     const { name, value } = e.target;
@@ -15,8 +21,43 @@ function SignIn() {
   const isValidate =
     userInfo.idValue.includes('@') && userInfo.pwValue.length >= 8;
 
+  const signinFetch = () => {
+    fetch(`${API.signin}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify({
+        email: idValue,
+        password: pwValue,
+      }),
+    })
+      .then(res => {
+        if (res.status !== 200) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
+      })
+      .then(data => {
+        localStorage.setItem('access_token', data.access_token);
+        navigate('/todo');
+      })
+      .catch(error => {
+        alert('아이디가 존재하지 않습니다.');
+        navigate('/signup');
+      });
+  };
+
+  useEffect(() => {
+    if (isToken) {
+      alert('이미 로그인이 되어 있으므로 Todo페이지로 이동합니다.');
+      navigate('/todo');
+    }
+  }, []);
+
   return (
     <Container>
+      <Header>환영합니다!</Header>
       <InputWrap>
         <UserInput>
           <span>ID</span>
@@ -32,14 +73,25 @@ function SignIn() {
           <TextInput
             data-testid="password-input"
             name="pwValue"
+            type="password"
             onChange={getUserInfo}
             placeholder="8자 이상"
           />
         </UserInput>
-        <Button data-testid="signin-button" disabled={!isValidate}>
+        <Button
+          data-testid="signin-button"
+          disabled={!isValidate}
+          onClick={signinFetch}
+        >
           로그인하기
         </Button>
-        <Button data-testid="signup-button">회원가입</Button>
+        <Button
+          onClick={() => {
+            navigate('/signup');
+          }}
+        >
+          회원가입
+        </Button>
       </InputWrap>
     </Container>
   );
@@ -53,6 +105,10 @@ const Container = styled.div`
   left: 50%;
   text-align: center;
   transform: translate(-50%, -50%);
+`;
+
+const Header = styled.p`
+  font-size: 24px;
 `;
 
 const InputWrap = styled.div`

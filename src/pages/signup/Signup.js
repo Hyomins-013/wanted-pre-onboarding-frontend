@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import styled, { css, keyframes } from 'styled-components';
+import { API } from '../../Config';
 
 function SignUp() {
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({
     idValue: '',
     pwValue: '',
+    pwvfValue: '',
   });
+  const { idValue, pwValue } = userInfo;
 
   const getUserInfo = e => {
     const { name, value } = e.target;
@@ -13,13 +18,47 @@ function SignUp() {
   };
 
   const isValidate = ({ userInfo }) => {
-    console.log(userInfo);
     const isIdValid = userInfo.idValue.includes('@');
     const isPWValid = userInfo.pwValue.length >= 8;
+    const pwvfValid = userInfo.pwvfValue === userInfo.pwValue;
+    const verificationResult = {
+      alarmText: '',
+      isValid: false,
+    };
 
-    const isValid = isIdValid && isPWValid;
+    if (!isIdValid) {
+      verificationResult.alarmText = 'Id에 @를 포함시켜주세요';
+      verificationResult.isValid = false;
+    } else if (!isPWValid) {
+      verificationResult.alarmText = 'PW는 8자 이상 입력해주세요';
+      verificationResult.isValid = false;
+    } else if (!pwvfValid) {
+      verificationResult.alarmText = 'PW와 일치하지 않습니다';
+      verificationResult.isValid = false;
+    } else {
+      verificationResult.isValid = true;
+    }
 
-    return isValid;
+    return verificationResult;
+  };
+
+  const result = isValidate({ userInfo });
+
+  const signupFetch = () => {
+    fetch(`${API.signup}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify({
+        email: idValue,
+        password: pwValue,
+      }),
+    }).then(res =>
+      res.status === 201
+        ? (alert('회원가입에 성공하셨습니다!!'), navigate('/signin'))
+        : alert('회원가입에 실패하였습니다. 다시한번 시도해 주세요'),
+    );
   };
 
   return (
@@ -30,7 +69,7 @@ function SignUp() {
           <TextInput
             data-testid="email-input"
             name="idValue"
-            onChange={() => getUserInfo}
+            onChange={getUserInfo}
             placeholder="@ 를 포함한 ID"
           />
         </UserInput>
@@ -39,14 +78,28 @@ function SignUp() {
           <TextInput
             data-testid="password-input"
             name="pwValue"
+            type="password"
             onChange={getUserInfo}
             placeholder="8자 이상"
           />
         </UserInput>
-        <Button data-testid="signin-button" disabled={isValidate}>
-          로그인하기
-        </Button>
-        <Button data-testid="signup-button">회원가입</Button>
+        <UserInput>
+          <span>Password Verification</span>
+          <TextInput
+            data-testid="password-input"
+            name="pwvfValue"
+            type="password"
+            onChange={getUserInfo}
+            placeholder="패스워드 재입력"
+          />
+        </UserInput>
+        {result.isValid ? (
+          <Button data-testid="signup-button" onClick={signupFetch}>
+            회원가입하기
+          </Button>
+        ) : (
+          <WarningText>{result.alarmText}</WarningText>
+        )}
       </InputWrap>
     </Container>
   );
@@ -88,13 +141,34 @@ const TextInput = styled.input`
   height: 35px;
   padding: 10px 10px;
   font-size: 14px;
-  /* color: ${({ isActive }) => (isActive ? '#fff' : '#252525')}; */
   border-radius: 5px;
   border: 3px solid lightgrey;
   box-shadow: none;
   outline: none;
   background-color: transparent;
   flex: 1;
+`;
+
+const shakeAnimation = keyframes`
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(15px);
+  }
+  75% {
+    transform: translateX(-15px);
+  }
+`;
+
+const WarningText = styled.span`
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #c51605;
+  animation:
+    ${shakeAnimation} 1s,
+    pauseAnimation 2s;
 `;
 
 const Button = styled.button`
