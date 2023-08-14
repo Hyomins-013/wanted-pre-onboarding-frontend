@@ -137,7 +137,6 @@ const TextInput = styled.input`
   height: 35px;
   padding: 10px 10px;
   font-size: 14px;
-  /* color: ${({ isActive }) => (isActive ? '#fff' : '#252525')}; */
   border-radius: 5px;
   border: 3px solid lightgrey;
   box-shadow: none;
