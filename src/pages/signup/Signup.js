@@ -54,11 +54,18 @@ function SignUp() {
         email: idValue,
         password: pwValue,
       }),
-    }).then(res =>
-      res.status === 201
-        ? (alert('회원가입에 성공하셨습니다!!'), navigate('/signin'))
-        : alert('회원가입에 실패하였습니다. 다시한번 시도해 주세요'),
-    );
+    }).then(res => {
+      if (res.status === 201) {
+        alert('회원가입에 성공하셨습니다!!');
+        navigate('/signin');
+      } else if (res.status === 400) {
+        alert('동일한 Email이 존재합니다. 다른 이메일을 사용해주세요.');
+      } else {
+        alert(
+          '네트워크 상의 문제가 발생하였습니다. 다시한번 이용해 주시거나, 나중에 다시 시도해 주세요',
+        );
+      }
+    });
   };
 
   return (
