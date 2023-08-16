@@ -21,12 +21,10 @@
 
 https://github.com/Hyomins-013/wanted-pre-onboarding-frontend/assets/125179082/ca7149fb-20f6-4dc1-8581-084a72c5d720
 
-
 또한 데모영상은 AWS의 S3로 배포한 주소도 올립니다.
 http://s3-hyominshin-wanted-pre-onboarding-frontend-assignment.s3-website.ap-northeast-2.amazonaws.com
 
 
->>> 사용 라이브러리
-
+> 사용 라이브러리
 
 styled-Components, React-Router-Dom
