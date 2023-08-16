@@ -1,7 +1,5 @@
 # Wanted-pre-onBoarding-frontend
 
----
-
 > 이름
 
 신효민
