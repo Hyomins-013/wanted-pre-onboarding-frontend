@@ -1,6 +1,7 @@
 # Wanted-pre-onBoarding-frontend
 
-> 이름 : 신효민
+> 이름
+신효민
 
 ---
 
